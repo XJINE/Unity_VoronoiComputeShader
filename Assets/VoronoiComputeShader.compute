@@ -1,0 +1,34 @@
+#pragma kernel Voronoi
+
+RWTexture2D<float4>      VoronoiTexture;
+StructuredBuffer<float2> SeedBuffer; // Seed coords (0~1).
+StructuredBuffer<float4> SeedColors; // Seed colors (HSV).
+
+[numthreads(8, 8, 1)]
+void Voronoi(uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    VoronoiTexture.GetDimensions(width, height);
+
+    uint numSeeds, stride;
+    SeedBuffer.GetDimensions(numSeeds, stride);
+
+    float2 uv = float2(id.x, id.y) / float2(width, height);
+
+    float minDistance = 2; // max value of dot(difference, difference)
+    int   closestSeed = 0;
+
+    for (uint i = 0; i < numSeeds; i++)
+    {
+        float2 difference = uv - SeedBuffer[i];
+        float  distance   = dot(difference, difference);
+
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            closestSeed = i;
+        }
+    }
+
+    VoronoiTexture[id.xy] = SeedColors[closestSeed];
+}

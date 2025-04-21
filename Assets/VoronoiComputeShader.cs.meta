@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 11b3ef0609409a045bb7120d4cfcdbf7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - voronoiComputeShader: {fileID: 7200000, guid: 25864146cd3b76143b10b8d189d5f2fa, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
