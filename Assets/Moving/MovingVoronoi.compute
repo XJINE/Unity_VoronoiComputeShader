@@ -1,0 +1,61 @@
+#pragma kernel MovingVoronoi
+#pragma kernel UpdateSeeds
+
+struct Seed
+{
+    float2 coord;
+    float4 color;
+    float2 velocity;
+};
+
+RWTexture2D<float4>      Texture;
+RWStructuredBuffer<Seed> SeedBuffer;
+float                    DeltaTime;
+
+[numthreads(8, 8, 1)]
+void MovingVoronoi(uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    Texture.GetDimensions(width, height);
+
+    uint numSeeds, stride;
+    SeedBuffer.GetDimensions(numSeeds, stride);
+
+    float2 uv = float2(id.x, id.y) / float2(width, height);
+
+    float minDistance = 2; // max value of dot(difference, difference)
+    int   closestSeed = 0;
+
+    for (uint i = 0; i < numSeeds; i++)
+    {
+        Seed   seed       = SeedBuffer[i];
+        float2 difference = uv - seed.coord;
+        float  distance   = dot(difference, difference);
+
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            closestSeed = i;
+        }
+    }
+
+    // Texture[id.xy] = SeedBuffer[closestSeed].color;
+
+    // NOTE:
+    // Draw center point of cell.
+    Texture[id.xy] = minDistance < 0.0002 ?
+                     float4(1-SeedBuffer[closestSeed].color.rgb, 1) :
+                     SeedBuffer[closestSeed].color;
+}
+
+[numthreads(1, 1, 1)]
+void UpdateSeeds(uint id : SV_DispatchThreadID)
+{
+    Seed seed = SeedBuffer[id];
+         seed.coord += seed.velocity;
+
+    if (seed.coord.x < 0 || seed.coord.x > 1) seed.velocity.x *= -1;
+    if (seed.coord.y < 0 || seed.coord.y > 1) seed.velocity.y *= -1;
+
+    SeedBuffer[id] = seed;
+}
