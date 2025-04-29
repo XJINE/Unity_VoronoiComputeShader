@@ -7,16 +7,12 @@ StructuredBuffer<float4> SeedColors; // Seed colors (HSV).
 [numthreads(8, 8, 1)]
 void Voronoi(uint3 id : SV_DispatchThreadID)
 {
-    uint width, height;
-    VoronoiTexture.GetDimensions(width, height);
+    float2 texSize;          VoronoiTexture.GetDimensions(texSize.x, texSize.y);
+    uint   numSeeds, stride; SeedBuffer    .GetDimensions(numSeeds,  stride   );
 
-    uint numSeeds, stride;
-    SeedBuffer.GetDimensions(numSeeds, stride);
-
-    float2 uv = float2(id.x, id.y) / float2(width, height);
-
-    float minDistance = 2; // max value of dot(difference, difference)
-    int   closestSeed = 0;
+    float2 uv          = id.xy / texSize;
+    float  minDistance = 2; // max value of dot(difference, difference)
+    int    closestSeed = 0;
 
     for (uint i = 0; i < numSeeds; i++)
     {

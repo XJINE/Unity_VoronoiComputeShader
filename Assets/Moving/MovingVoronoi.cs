@@ -77,8 +77,7 @@ public class MovingVoronoi : MonoBehaviour
         _seedBufferCompute = new ComputeBuffer(numSeeds, Marshal.SizeOf(typeof(Seed)));
         _seedBufferCompute.SetData(_seedBuffer);
 
-        movingVoronoiComputeShader.SetTexture(_kernelIndex_MovingVoronoi, PropertyID_Texture, _texture);
-        movingVoronoiComputeShader.SetTexture(_kernelIndex_UpdateSeeds,   PropertyID_Texture, _texture);
+        movingVoronoiComputeShader.SetTexture(_kernelIndex_MovingVoronoi, PropertyID_Texture,    _texture);
         movingVoronoiComputeShader.SetBuffer (_kernelIndex_MovingVoronoi, PropertyID_SeedBuffer, _seedBufferCompute);
         movingVoronoiComputeShader.SetBuffer (_kernelIndex_UpdateSeeds,   PropertyID_SeedBuffer, _seedBufferCompute);
     }
